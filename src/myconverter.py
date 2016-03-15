@@ -37,13 +37,13 @@ def convert_files(file_paths, vocabulary, punctuations, use_pauses, output_path)
                         punctuation = " "
                         pause = 0.
 
-    array = np.zeros(shape=(1, len(vocabulary)), dtype=np.int8)
-    array[0,utils.input_word_index(vocabulary, "<END>")] = 1
-    inputs.append(array)
+                array = np.zeros(shape=(1, len(vocabulary)), dtype=np.int8)
+                array[0,utils.input_word_index(vocabulary, "<END>")] = 1
+                inputs.append(array)
 
-    array = np.zeros(shape=(1, len(punctuations)), dtype=np.int8)
-    array[0,utils.punctuation_index(punctuations, punctuation)] = 1
-    outputs.append(array)
+                array = np.zeros(shape=(1, len(punctuations)), dtype=np.int8)
+                array[0,utils.punctuation_index(punctuations, punctuation)] = 1
+                outputs.append(array)
 
 #    if use_pauses:
 #        pauses.append(pause)
