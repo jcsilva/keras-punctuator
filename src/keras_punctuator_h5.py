@@ -40,10 +40,10 @@ print('Build model...')
 hidden_neurons = 100
 
 model = Sequential()
-model.add(LSTM(hidden_neurons, input_shape=(1, input_data_size), return_sequences=True))
+model.add(LSTM(hidden_neurons, input_shape=(1, input_data_size), return_sequences=False))
 model.add(Dropout(0.2))
-model.add(LSTM(hidden_neurons, return_sequences=False))
-model.add(Dropout(0.2))
+#model.add(LSTM(hidden_neurons, return_sequences=False))
+#model.add(Dropout(0.2))
 model.add(Dense(output_data_size, init="uniform"))
 model.add(Activation("softmax"))
 model.compile(loss="categorical_crossentropy", optimizer="rmsprop")
@@ -53,64 +53,44 @@ earlyStopping=EarlyStopping(monitor='val_loss', patience=2, verbose=0, mode='aut
 
 hist = model.fit(X_train, y_train, 
                  batch_size=200, 
-                 nb_epoch=15, 
+                 nb_epoch=150, 
                  validation_data=(X_test, y_test), 
                  show_accuracy=True, 
                  callbacks=[earlyStopping], 
                  shuffle='batch')
 
-score, acc = model.evaluate(X_test, y_test,
-                            batch_size=16,
-                            show_accuracy=True)
+#score, acc = model.evaluate(X_test, y_test,
+#                            batch_size=16,
+#                            show_accuracy=True)
 
-print('Test score:', score)
-print('Test accuracy:', acc)
-print(hist.history)
-
-
+#print('Test score:', score)
+#print('Test accuracy:', acc)
+#print(hist.history)
 
 
-
-#def sample(a, temperature=1.0):
-    # helper function to sample an index from a probability array
-#    a = np.log(a) / temperature
-#    a = np.exp(a) / np.sum(np.exp(a))
-#    return np.argmax(np.random.multinomial(1, a, 1))
-
-# train the model, output generated text after each iteration
-#for iteration in range(1,7001):
-#    print()
-#    print('-' * 50)
-#    print('Iteration', iteration)
-
-#    model.fit(X, y)
-
-#    start_index = random.randint(0, len(text) - num_unrollings -1)
+# Predictions
+y_pred = model.predict(X_test)
 
 
-#    if (iteration % 1000) == 0:
-#        for diversity in [0.2, 0.5, 1.0, 1.2]:
-#            print()
-#            print('----- diversity:', diversity)
+from sklearn.metrics import classification_report
 
-#            generated = ''
-#            sentence = text[start_index]
-#            generated += sentence
-#            print('----- Generating with seed: "' + sentence + '"')
-#            sys.stdout.write(generated)
-#
-#            for i in range(400):
-#                x = np.zeros((1, vocabulary_size))
-#                for t, char in enumerate(sentence):
-#                    x[0, char2id(char)] = 1.
-#
-#                preds = model.predict(x, verbose=0)[0]
-#                next_index = sample(preds, diversity)
-#                next_char = id2char(next_index)
-#
-#                generated += next_char
-#                sentence = sentence[1:] + next_char
+y_gen = np.argmax(y_pred, axis=1)
+y_ref = list()
+for i in y_test:
+  y_ref.append(np.argmax(i))
 
-#                sys.stdout.write(next_char)
-#                sys.stdout.flush()
-#            print()
+print('y_ref argmax: ' + str(np.argmax(y_ref)) + ' y_gen argmax: ' + str(np.argmax(y_gen)))
+
+print(classification_report(y_ref, y_gen))
+
+
+
+
+
+
+# Save models
+json_string = model.to_json()
+with open('model_architecture.json', 'w') as output_file:
+  output_file.write(json_string)
+model.save_weights('model_weights.h5', overwrite=True)
+
