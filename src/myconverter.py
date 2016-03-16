@@ -14,6 +14,14 @@ def convert_files(file_paths, vocabulary, punctuations, output_path):
     for file_path in file_paths:
         with open(file_path, 'r') as corpus:
             for line in corpus:
+                array = np.zeros(shape=(1, len(vocabulary)), dtype=np.int8)
+                array[0,utils.input_word_index(vocabulary, "<START>")] = 1
+                inputs.append(array)
+                
+                array = np.zeros(shape=(1, len(punctuations)), dtype=np.int8)
+                array[0,utils.punctuation_index(punctuations, " ")] = 1
+                outputs.append(array)
+
                 for token in line.split():
                     if token in punctuations:
                         punctuation = token
@@ -30,7 +38,7 @@ def convert_files(file_paths, vocabulary, punctuations, output_path):
                 array = np.zeros(shape=(1, len(vocabulary)), dtype=np.int8)
                 array[0,utils.input_word_index(vocabulary, "<END>")] = 1
                 inputs.append(array)
-
+                
                 array = np.zeros(shape=(1, len(punctuations)), dtype=np.int8)
                 array[0,utils.punctuation_index(punctuations, punctuation)] = 1
                 outputs.append(array)

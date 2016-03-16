@@ -26,6 +26,7 @@ with open(input_text_file, 'r') as text_file:
     tokens = line.strip().split()
     if len(tokens) > 0:
       wordvec = np.zeros(shape=(len(tokens)+1,1,len(vocabulary)), dtype=np.int8)
+      wordvec[0,0,vocabulary["<START>"]] = 1
       for i in range(len(tokens)):
         if tokens[i] in vocabulary:
           idx = vocabulary[tokens[i]]

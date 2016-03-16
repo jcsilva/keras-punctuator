@@ -19,6 +19,8 @@ def load_vocabulary(file_path):
         vocabulary["<unk>"] = len(vocabulary)
     if "<END>" not in vocabulary:
         vocabulary["<END>"] = len(vocabulary)
+    if "<START>" not in vocabulary:
+        vocabulary["<START>"] = len(vocabulary)
     return vocabulary
     
 def load_model(file_path):
