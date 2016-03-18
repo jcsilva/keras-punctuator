@@ -5,6 +5,7 @@ import random
 import string
 import sys
 import h5py
+import os.path as op
 
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation, Dropout
@@ -13,7 +14,18 @@ from keras.callbacks import EarlyStopping
 from keras.utils.io_utils import HDF5Matrix
 from sklearn.metrics import classification_report
 
-data = np.load('../data/train1.pkl')
+if (len(sys.argv) <= 2):
+  print("[ERROR]: You must inform the Database.h5 path and a place to save the outputs")
+  exit(-1)
+
+filename = op.basename(sys.argv[1]).split('.')[0]
+dirname = op.dirname(sys.argv[1])
+output_path = sys.argv[2]
+
+pickle_file = op.join(dirname, filename+'.pkl')
+h5_file = op.join(dirname, filename+'.h5')
+
+data = np.load(pickle_file)
 total_size  = data['total_size']
 vocabulary  = data['vocabulary']
 punctuation = data['punctuations']
@@ -30,7 +42,7 @@ def load_data(datapath, train_start, n_training_examples, test_start, n_test_exa
     y_test  = HDF5Matrix(datapath, 'outputs', test_start,  test_start+n_test_examples)
     return X_train, y_train, X_test, y_test
 
-X_train, y_train, X_test, y_test = load_data('../data/train1.h5', 
+X_train, y_train, X_test, y_test = load_data(h5_file, 
                                    0, int(math.floor(train_amount*total_size)), 
                                    int(math.ceil(train_amount*total_size)), 
                                    int(total_size-math.ceil(train_amount*total_size)))
@@ -72,6 +84,6 @@ print(classification_report(y_ref, y_gen))
 
 # Save model and weights
 json_string = model.to_json()
-with open('model_architecture.json', 'w') as output_file:
+with open(op.join(output_path, 'model_architecture.json'), 'w') as output_file:
   output_file.write(json_string)
-model.save_weights('model_weights.h5', overwrite=True)
+model.save_weights(op.join(output_path,'model_weights.h5'), overwrite=True)
