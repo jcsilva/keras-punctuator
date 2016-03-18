@@ -12,6 +12,13 @@ def input_word_index(vocabulary, input_word):
 def punctuation_index(punctuations, punctuation):
     return punctuations[punctuation]
 
+def load_punctuations(file_path):
+    with open(file_path, 'r') as pkt:
+        punctuations = {p.strip(): i for (i, p) in enumerate(pkt)}
+    if " " not in punctuations:
+        punctuations[" "] = len(punctuations)
+    return punctuations
+
 def load_vocabulary(file_path):
     with open(file_path, 'r') as vocab:
         vocabulary = {w.strip(): i for (i, w) in enumerate(vocab)}
